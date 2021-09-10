@@ -16,3 +16,14 @@ kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectca
 
 echo "[TASK 5] Generate and save cluster join command to /joincluster.sh"
 kubeadm token create --print-join-command > /joincluster.sh 2>/dev/null
+
+echo "[TASK 6] Setup NFS server"
+sudo apt update
+sudo apt-get install -y nfs-kernel-server
+sudo mkdir -p /mnt/kubedata
+sudo chown nobody /mnt/kubedata
+sudo chmod 777 /mnt/kubedata
+cat >>/etc/exports<<EOF
+/mnt/kubedata   *(rw,sync,no_subtree_check,insecure)
+EOF
+sudo exportfs -rav
